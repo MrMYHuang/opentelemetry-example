@@ -1,0 +1,8 @@
+node_modules
+dist
+swift/Pods
+*.xcworkspacedata
+xcshareddata
+xcuserdata
+.DS_Store
+config/certs/
