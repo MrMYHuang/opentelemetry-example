@@ -2,10 +2,11 @@ import express from 'express';
 import { MeterProvider, ConsoleMetricExporter } from '@opentelemetry/sdk-metrics-base';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
+const port = 8089;
+
 const meter = new MeterProvider({
     exporter: new PrometheusExporter({
-        host: '172.16.3.178',
-        port: 31837,
+        port: 8090,
     }),
     interval: 1000,
 }).getMeter('myMeter');
@@ -16,9 +17,8 @@ const app = express();
 
 app.use((req, res, next) => {
     if (!boundInstrumenets.has(req.path)) {
-        const labels = { route: req.path };
-        const requestCount = meter.createCounter(`${req.path} requests`, {
-            description: 'Count requests',
+        const requestCount = meter.createCounter(`requests${req.path.replace('/', '_')}`, {
+            description: `Count requests for ${req.path}`,
         });
         boundInstrumenets.set(req.path, requestCount);
     }
@@ -39,6 +39,6 @@ app.get('/bar', (req, res) => {
     res.send('Hello bar.');
 });
 
-app.listen(8080, () => {
-    console.log('Server started on http://localhost:8080');
+app.listen(port, () => {
+    console.log(`Server started on http://localhost:${port}`);
 });
