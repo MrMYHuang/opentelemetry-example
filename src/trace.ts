@@ -17,7 +17,13 @@ const sdk = new opentelemetry.NodeSDK({
     traceExporter: new OTLPTraceExporter({
         url: 'http://tempo.loki:4318/v1/traces'
     }),
-    instrumentations: [getNodeAutoInstrumentations()]
+    instrumentations: [getNodeAutoInstrumentations({
+        "@opentelemetry/instrumentation-http": {
+            applyCustomAttributesOnSpan: (span, req, res) => {
+                span.setAttribute('service.name', 'tempo-test');
+            }
+        }
+    })]
 });
 /**/
 
